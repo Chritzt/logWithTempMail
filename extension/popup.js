@@ -1,4 +1,5 @@
-const SERVER_URL = "http://127.0.0.1:5000/api";
+
+const SERVER_URL = API_URL;
 
 // When opening the popup, look if there is an active account
 document.addEventListener("DOMContentLoaded", () => {
