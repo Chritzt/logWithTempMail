@@ -30,12 +30,20 @@ jobs:
       - name: Setup Docker buildx
         uses: docker/setup-buildx-action@v2.5.0
 
-      - name: Log into registry ${{ env.REGISTRY }}
+      # 1. Login bei GitHub Container Registry (für den Push)
+      - name: Log into GHCR ${{ env.REGISTRY }}
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      # 2. NEU: Login bei Docker Hub (damit Docker Scout sich authentifizieren kann)
+      - name: Log into Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
       - name: Extract Docker metadata
         id: meta
@@ -60,3 +68,13 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             API_URL=${{ secrets.PROD_API_URL }}
+
+      # 3. WIEDER DA: Docker Scout Vulnerability Scan
+      - name: Docker Scout Vulnerability Scan
+        uses: docker/scout-action@v1
+        with:
+          command: cves
+          image: ${{ steps.meta.outputs.tags }}
+          sarif-file: scout-report.sarif
+          ignore-unchanged: true
+          only-severities: critical,high
