@@ -9,7 +9,7 @@ CORS(app)
 
 BASE_URL = "https://api.mail.tm"
 
-#test-command
+#test-command23
 def generate_password(length=16):
   chars = string.ascii_letters + string.digits + "!@#$%^&*()_-+=<>?"
   return "".join(secrets.choice(chars) for _ in range(length))
